@@ -12,8 +12,6 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# This addon was generated with the Visual Scripting Addon.
-# You can find the addon under https://blendermarket.com/products/serpens
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 sn_tree_name = "NodeTree"
 addon_keymaps = []
@@ -219,8 +217,8 @@ class SNA_OT_Operator_98368dbebf(bpy.types.Operator):
             #bpy.context.active_object.data.lens = int(
                 #bpy.context.scene.sn_generated_addon_properties_UID_Wedsjpol.Focal_Length)
             exec(r"bpy.context.scene.camera = bpy.context.active_object")
-            bpy.data.window_managers[
-                r"WinMan"].vpt_osc_udp_in = bpy.context.scene.sn_generated_addon_properties_UID_Wedsjpol.Local_IP
+            #bpy.data.window_managers[
+                #r"WinMan"].vpt_osc_udp_in = bpy.context.scene.sn_generated_addon_properties_UID_Wedsjpol.Local_IP
             bpy.data.window_managers[r"WinMan"].vpt_osc_port_in = int(
                 bpy.context.scene.sn_generated_addon_properties_UID_Wedsjpol.Port)
             bpy.data.window_managers[r"WinMan"].vpt_osc_in_enable = True
@@ -320,8 +318,8 @@ class SNA_PT_b6a4a58563(bpy.types.Panel):
 
         layout.prop(bpy.context.scene.sn_generated_addon_properties_UID_Wedsjpol, 'Focal_Length', emboss=True,
                     text=r"Focal Length", slider=False)
-        layout.prop(bpy.context.scene.sn_generated_addon_properties_UID_Wedsjpol, 'Local_IP', emboss=True,
-                    text=r"Local IP ")
+        #layout.prop(bpy.context.scene.sn_generated_addon_properties_UID_Wedsjpol, 'Local_IP', emboss=True,
+                    #text=r"Local IP ")
         layout.prop(bpy.context.scene.sn_generated_addon_properties_UID_Wedsjpol, 'Port', emboss=True,
                     text=r"Set OSC Port", slider=False)
         layout.prop(bpy.context.scene.sn_generated_addon_properties_UID_Wedsjpol, 'Record', toggle=True, emboss=True,
@@ -403,14 +401,14 @@ class SNA_OT_BTN_9a2fd396ce(bpy.types.Operator):
             bpy.ops.object.empty_add(type='PLAIN_AXES', align='WORLD', location=(0, 0, 0))
             bpy.context.object.rotation_mode = 'QUATERNION'
             emt = bpy.context.object.name = "VP Orientation Correction"
-            bpy.ops.object.hide_view_set(unselected=False)
+            #bpy.ops.object.hide_view_set(unselected=False)
 
             # Add Empty for Offset
             off = bpy.ops.object.empty_add(type='PLAIN_AXES', align='WORLD', location=(0, 0, 0))
             bpy.context.object.rotation_euler[0] = 1.5708
             off = bpy.context.object.name = "VP Camera Offset"
             bpy.data.objects["VP Camera"].parent = bpy.data.objects["VP Camera Offset"]
-            bpy.ops.object.hide_view_set(unselected=False)
+            #bpy.ops.object.hide_view_set(unselected=False)
 
             # UUID Variable
             uid = bpy.context.scene.sn_generated_addon_properties_UID_Wedsjpol.UUID
@@ -522,10 +520,10 @@ class SNA_OT_BTN_9a2fd396ce(bpy.types.Operator):
 
             try:
                 add_driver(camera, empty, 'location', 'location.x', 0)
-                add_driver(camera, empty, 'location', 'location.y', 2)
-                add_driver(camera, empty, 'location', 'location.z', 1)
+                add_driver(camera, empty, 'location', 'location.y', 1)
+                add_driver(camera, empty, 'location', 'location.z', 2)
 
-                bpy.data.objects["VP Camera"].animation_data.drivers[2].driver.expression = '-location'
+               # bpy.data.objects["VP Camera"].animation_data.drivers[2].driver.expression = '-location'
 
                 # Rotation
 
@@ -563,8 +561,8 @@ class GeneratedAddonProperties_UID_Wedsjpol(bpy.types.PropertyGroup):
     def update_UUID(self, context):
         pass
 
-    def update_Local_IP(self, context):
-        pass
+    #def update_Local_IP(self, context):
+        #pass
 
     def update_X_Position(self, context):
         pass
@@ -586,8 +584,8 @@ class GeneratedAddonProperties_UID_Wedsjpol(bpy.types.PropertyGroup):
                                            update=update_Camera_Height)
     UUID: bpy.props.StringProperty(name='UUID', description='here', default='blender', subtype='NONE',
                                    update=update_UUID)
-    Local_IP: bpy.props.StringProperty(name='Local_IP', description='Set ip address', default='0.0.0.0', subtype='NONE',
-                                       update=update_Local_IP)
+    #Local_IP: bpy.props.StringProperty(name='Local_IP', description='Set ip address', default='0.0.0.0', subtype='NONE',
+                                       #update=update_Local_IP)
     X_Position: bpy.props.FloatProperty(name='X_Position', description='Camera Offset X Position', default=0.0,
                                         subtype='NONE', update=update_X_Position)
     Y_Position: bpy.props.FloatProperty(name='Y_Position', description='Camera Offset Y Position', default=0.0,
@@ -989,8 +987,8 @@ class MainLoop(bpy.types.Operator):
         if event.type == "TIMER":
             if DO_CAPTURE:
                 if not os.path.isfile(TMP_JPG):
-                    #bpy.ops.render.opengl(animation=False, render_keyed_only=False, sequencer=False, write_still=True, view_context=False)
-                    bpy.ops.render.render(animation=False, write_still=True, use_viewport=False, layer='', scene='')
+                    bpy.ops.render.opengl(animation=False, render_keyed_only=False, sequencer=False, write_still=True, view_context=False)
+                    #bpy.ops.render.render(animation=False, write_still=True, use_viewport=False, layer='', scene='')
                     ## is os.rename atomic on Windows?
                     #https://bugs.python.org/issue8828
                     os.rename(TMP_JPG_WRITE, TMP_JPG)
