@@ -1044,8 +1044,8 @@ def register():
         bpy.utils.register_class(SNA_OT_BTN_9a2fd396ce)
 
 
-        bpy.types.Scene.vpt_do_capture = bpy.props.BoolProperty(name="stream camera")
-        bpy.types.Scene.vpt_use_eevee = bpy.props.BoolProperty(name="use eevee")
+        bpy.types.Scene.vpt_do_capture = bpy.props.BoolProperty(name="Stream Camera")
+        bpy.types.Scene.vpt_use_eevee = bpy.props.BoolProperty(name="Use Eevee")
         bpy.utils.register_class(MainLoop)
 
     except:
