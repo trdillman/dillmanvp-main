@@ -337,8 +337,11 @@ class SNA_PT_b6a4a58563(bpy.types.Panel):
         layout.prop(bpy.context.scene.sn_generated_addon_properties_UID_Wedsjpol, 'Z_Position', emboss=True, text=r"",
                     slider=False)
 
-        if not DO_CAPTURE:
+        if not httpd:
             layout.operator("dillmanvp.main", text="Start Server", emboss=True, depress=False)
+        else:
+            layout.prop(bpy.context.scene, 'vpt_do_capture')
+            layout.prop(bpy.context.scene, 'vpt_use_eevee')
 
 class SNA_OT_BTN_9a2fd396ce(bpy.types.Operator):
     bl_idname = 'scripting_nodes.sna_ot_btn_9a2fd396ce'
@@ -609,7 +612,6 @@ def set_variables():
 
 ## Streaming Server ##
 HTTPD = None
-DO_CAPTURE = False
 #STREAM_MODE = 'webp'  ## note: there is a bug in firefox 'load' not getting called at right time
 STREAM_MODE = 'jpg'
 CAP_RATE = 0.01
@@ -930,8 +932,9 @@ class Handler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             self.wfile.write( TESTPAGE.encode('utf-8') )
 
 httpd = None
+httpd_thread = None
 def run_http():
-    global httpd
+    global httpd, httpd_thread
     if httpd:
         print("WARN: httpd is already running")
         return
@@ -941,37 +944,13 @@ def run_http():
         ## [Errno 98] Address already in use
         httpd = None
     if httpd:
-        threading._start_new_thread( httpd.serve_forever, tuple([]) )
+        httpd_thread = threading.Thread( target=httpd.serve_forever, daemon=True )
+        httpd_thread.start()
         print('running http on localhost:8081')
+        print(dir(httpd_thread))
     else:
         print('ERROR: failed to run http on localhost:8081')
-        sys.exit(1)
-def run_https():
-    global httpd
-    import ssl
-    try:
-        httpd = SocketServer.TCPServer(("", 4443), Handler)
-    except OSError:
-        ## [Errno 98] Address already in use
-        httpd = None
-    if httpd:
-        pem = os.path.join(directory,'server.pem')
-        if not os.path.isfile(pem):
-            openssl = 'openssl'
-            if OSTYPE == 'Windows':
-                openssl = os.path.join(directory, 'openssl.exe')
-            subprocess.check_call([openssl, 'req', '-new', '-x509', '-keyout', pem, '-out', pem, '-days', '365', '-nodes'])
-
-        httpd.socket = ssl.wrap_socket(
-            httpd.socket, 
-            certfile=pem, 
-            server_side=True
-        )
-        threading._start_new_thread( httpd.serve_forever, tuple([]) )
-        print('running http on https://localhost:4443')
-    else:
-        print('ERROR: failed to run http on https://localhost:4443')
-        sys.exit(1)
+        #sys.exit(1)
 
 
 _mainloop_timer = None
@@ -985,10 +964,12 @@ class MainLoop(bpy.types.Operator):
         global COMMANDS
         #print(event.type)
         if event.type == "TIMER":
-            if DO_CAPTURE:
+            if context.scene.vpt_do_capture:
                 if not os.path.isfile(TMP_JPG):
-                    bpy.ops.render.opengl(animation=False, render_keyed_only=False, sequencer=False, write_still=True, view_context=False)
-                    #bpy.ops.render.render(animation=False, write_still=True, use_viewport=False, layer='', scene='')
+                    if context.scene.vpt_use_eevee:
+                        bpy.ops.render.render(animation=False, write_still=True, use_viewport=False, layer='', scene='')
+                    else:
+                        bpy.ops.render.opengl(animation=False, render_keyed_only=False, sequencer=False, write_still=True, view_context=False)
                     ## is os.rename atomic on Windows?
                     #https://bugs.python.org/issue8828
                     os.rename(TMP_JPG_WRITE, TMP_JPG)
@@ -1026,15 +1007,11 @@ class MainLoop(bpy.types.Operator):
         return {'PASS_THROUGH'}  ## will not supress event bubbles
 
     def invoke(self, context, event):
-        global _mainloop_timer, DO_CAPTURE
-        DO_CAPTURE = True
+        global _mainloop_timer
+        context.scene.vpt_do_capture = True
         resize_capture( CAP_WIDTH, CAP_HEIGHT )
         if _mainloop_timer is None:
-            if '--https' in sys.argv:
-                run_https()
-            else:
-                run_http()
-
+            run_http()
             _mainloop_timer = self._timer = context.window_manager.event_timer_add(
                 #time_step=0.0333,  ## this crashes my machine
                 time_step=CAP_RATE,
@@ -1067,6 +1044,8 @@ def register():
         bpy.utils.register_class(SNA_OT_BTN_9a2fd396ce)
 
 
+        bpy.types.Scene.vpt_do_capture = bpy.props.BoolProperty(name="stream camera")
+        bpy.types.Scene.vpt_use_eevee = bpy.props.BoolProperty(name="use eevee")
         bpy.utils.register_class(MainLoop)
 
     except:
