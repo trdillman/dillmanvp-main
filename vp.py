@@ -421,7 +421,7 @@ class SNA_OT_BTN_9a2fd396ce(bpy.types.Operator):
             bpy.context.scene.VPT_Items[0].data_path = "location"
             bpy.context.scene.VPT_Items[0].engine = 'OSC'
             bpy.context.scene.VPT_Items[0].mode = 'Receive'
-            bpy.context.scene.VPT_Items[0].osc_address = "/osc/pos"
+            bpy.context.scene.VPT_Items[0].osc_address = "/osc/possmooth"
             bpy.context.scene.VPT_Items[0].is_multi = True
             bpy.context.scene.VPT_Items[0].use_array = True
             bpy.context.scene.VPT_Items[0].osc_select_n = 3
@@ -435,7 +435,7 @@ class SNA_OT_BTN_9a2fd396ce(bpy.types.Operator):
             bpy.context.scene.VPT_Items[1].data_path = "rotation_quaternion"
             bpy.context.scene.VPT_Items[1].engine = 'OSC'
             bpy.context.scene.VPT_Items[1].mode = 'Receive'
-            bpy.context.scene.VPT_Items[1].osc_address = "/osc/quat"
+            bpy.context.scene.VPT_Items[1].osc_address = "/osc/quatsmooth"
             bpy.context.scene.VPT_Items[1].is_multi = True
             bpy.context.scene.VPT_Items[1].use_array = True
             bpy.context.scene.VPT_Items[1].osc_select_n = 4
@@ -455,6 +455,38 @@ class SNA_OT_BTN_9a2fd396ce(bpy.types.Operator):
             bpy.context.scene.VPT_Items[2].is_multi = False
             bpy.context.scene.VPT_Items[2].VAR_use = 'dp'
             bpy.context.scene.VPT_Items[2].record = varBL
+
+            # Add route for Focus Distance
+
+            bpy.ops.object.select_camera()
+            bpy.context.object.data.dof.use_dof = True
+            bpy.context.object.data.name = "VP Camera"
+            bpy.ops.vpt.addprop()
+            bpy.context.scene.VPT_Items[3].id_type = 'cameras'
+            bpy.context.scene.VPT_Items[3].id.cameras = bpy.data.cameras["VP Camera"]
+            bpy.context.scene.VPT_Items[3].data_path = "dof.focus_distance"
+            bpy.context.scene.VPT_Items[3].engine = 'OSC'
+            bpy.context.scene.VPT_Items[3].mode = 'Receive'
+            bpy.context.scene.VPT_Items[3].osc_address = "/osc/focus"
+            bpy.context.scene.VPT_Items[3].is_multi = False
+            bpy.context.scene.VPT_Items[3].VAR_use = 'dp'
+            bpy.context.scene.VPT_Items[3].record = varBL
+
+            #Add routes for DOF
+
+            bpy.ops.object.select_camera()
+            bpy.context.object.data.dof.use_dof = True
+            bpy.context.object.data.name = "VP Camera"
+            bpy.ops.vpt.addprop()
+            bpy.context.scene.VPT_Items[4].id_type = 'cameras'
+            bpy.context.scene.VPT_Items[4].id.cameras = bpy.data.cameras["VP Camera"]
+            bpy.context.scene.VPT_Items[4].data_path = "dof.aperture_fstop"
+            bpy.context.scene.VPT_Items[4].engine = 'OSC'
+            bpy.context.scene.VPT_Items[4].mode = 'Receive'
+            bpy.context.scene.VPT_Items[4].osc_address = "/osc/dof"
+            bpy.context.scene.VPT_Items[4].is_multi = False
+            bpy.context.scene.VPT_Items[4].VAR_use = 'dp'
+            bpy.context.scene.VPT_Items[4].record = varBL
 
 
             # Delete all drivers
