@@ -428,7 +428,7 @@ class SNA_OT_BTN_9a2fd396ce(bpy.types.Operator):
             bpy.context.scene.VPT_Items[0].engine = 'OSC'
             bpy.context.scene.VPT_Items[0].mode = 'Receive'
             bpy.context.scene.VPT_Items[0].osc_address = "/osc/possmooth"
-            bpy.context.scene.VPT_Items[0].is_multi = True
+            bpy.context.scene.VPT_Items[0].is_multi = False
             bpy.context.scene.VPT_Items[0].use_array = True
             bpy.context.scene.VPT_Items[0].osc_select_n = 3
             bpy.context.scene.VPT_Items[0].VAR_use = 'dp'
