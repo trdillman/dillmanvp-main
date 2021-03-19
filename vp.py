@@ -369,6 +369,12 @@ class SNA_OT_BTN_9a2fd396ce(bpy.types.Operator):
                 pass
 
             try:
+                object_to_delete = bpy.data.objects["Record Toggle"]
+                bpy.data.objects.remove(object_to_delete, do_unlink=True)
+            except:
+                pass
+
+            try:
                 object_to_delete = bpy.data.objects["VP Camera Offset"]
                 bpy.data.objects.remove(object_to_delete, do_unlink=True)
             except:
@@ -416,6 +422,11 @@ class SNA_OT_BTN_9a2fd396ce(bpy.types.Operator):
             bpy.context.object.rotation_euler[0] = 1.5708
             off = bpy.context.object.name = "VP Camera Offset"
             bpy.data.objects["VP Camera"].parent = bpy.data.objects["VP Camera Offset"]
+            #bpy.ops.object.hide_view_set(unselected=False)
+
+            # Add Empty for Record Toggle
+            rec = bpy.ops.object.empty_add(type='PLAIN_AXES', align='WORLD', location=(0, 0, 0))
+            rec = bpy.context.object.name = "Record Toggle"
             #bpy.ops.object.hide_view_set(unselected=False)
 
             # UUID Variable
@@ -495,6 +506,41 @@ class SNA_OT_BTN_9a2fd396ce(bpy.types.Operator):
             bpy.context.scene.VPT_Items[4].VAR_use = 'dp'
             bpy.context.scene.VPT_Items[4].record = varBL
 
+            # Add new route for record toggle
+            bpy.ops.vpt.addprop()
+            bpy.context.scene.VPT_Items[5].id.objects = bpy.data.objects["Record Toggle"]
+            bpy.context.scene.VPT_Items[5].data_path = "location"
+            bpy.context.scene.VPT_Items[5].engine = 'OSC'
+            bpy.context.scene.VPT_Items[5].array = 0
+            bpy.context.scene.VPT_Items[5].mode = 'Receive'
+            bpy.context.scene.VPT_Items[5].osc_address = "/osc/rec"
+            bpy.context.scene.VPT_Items[5].is_multi = False
+            bpy.context.scene.VPT_Items[5].VAR_use = 'dp'
+
+            #Play Function
+            data = {}  # keep data in a dictionary
+            TOL = 1.0  # how much the cube needs to move in a frame
+
+            def play():
+                bpy.ops.screen.animation_play()
+
+            def loc_change(scene):
+                # run some scripts if the cube has moved.
+                cube = scene.objects.get("Record Toggle")
+                loc = cube.location
+
+                dloc = loc - data["CubeLoc"]
+
+                if dloc.length > TOL:
+                    # print("FRAME:%d Cube has moved" % scene.frame_current)
+                    #        bpy.ops.screen.animation_play()
+                    data["CubeLoc"] = loc.copy()
+                    play()
+
+            bpy.app.handlers.depsgraph_update_post.append(loc_change)
+
+            # initialise data
+            data["CubeLoc"] = bpy.data.objects.get("Record Toggle").location.copy()
 
             # Delete all drivers
             try:
