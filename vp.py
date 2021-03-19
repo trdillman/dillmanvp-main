@@ -244,12 +244,19 @@ class SNA_OT_BTN_5284383e90(bpy.types.Operator):
             # Purge all VPT props
             for i in range(10):
                 try:
+                    bpy.data.window_managers["WinMan"].vpt_osc_debug = True
                     x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
                     bpy.ops.vpt.removeprop(n=x[i])
+                    bpy.data.window_managers["WinMan"].vpt_osc_debug = False
                 except:
                     pass
             # Purge all VP empties
             try:
+                ob = bpy.data.objects['VP Camera']
+                me = ob.data
+                me.users
+                me.user_clear()
+                bpy.data.cameras.remove(me)
                 object_to_delete = bpy.data.objects["VP Orientation Correction"]
                 bpy.data.objects.remove(object_to_delete, do_unlink=True)
             except:
@@ -367,7 +374,7 @@ class SNA_OT_BTN_9a2fd396ce(bpy.types.Operator):
             except:
                 pass
 
-            for i in range(10):
+            for i in range(1000):
                 try:
                     object_to_delete = bpy.data.objects["VP Orientation Correction.00{}".format(i)]
                     bpy.data.objects.remove(object_to_delete, do_unlink=True)
@@ -380,20 +387,18 @@ class SNA_OT_BTN_9a2fd396ce(bpy.types.Operator):
                 except:
                     pass
 
-            for i in range(10):
+            for i in range(1000):
                 try:
                     object_to_delete = bpy.data.objects["VP Camera Offset.00{}".format(i)]
                     bpy.data.objects.remove(object_to_delete, do_unlink=True)
-                    for i in range(10):
-                        try:
-                            object_to_delete = bpy.data.objects["VP Camera.00{}".format(i)]
-                            bpy.data.objects.remove(object_to_delete, do_unlink=True)
-                        except:
-                            pass
+                    object_to_delete = bpy.data.objects["VP Camera.00{}".format(i)]
+                    bpy.data.objects.remove(object_to_delete, do_unlink=True)
+
                 except:
-                    pass
+                    print("Try Failed")
 
             try:
+
                 bpy.ops.outliner.orphans_purge()
             except:
                 pass
@@ -417,6 +422,7 @@ class SNA_OT_BTN_9a2fd396ce(bpy.types.Operator):
             uid = bpy.context.scene.sn_generated_addon_properties_UID_Wedsjpol.UUID
             # Add new route for location
             bpy.ops.vpt.addprop()
+            bpy.context.scene.VPT_Items[0].id_type = 'objects'
             bpy.context.scene.VPT_Items[0].id.objects = bpy.data.objects["VP Orientation Correction"]
             bpy.context.scene.VPT_Items[0].data_path = "location"
             bpy.context.scene.VPT_Items[0].engine = 'OSC'
@@ -431,6 +437,7 @@ class SNA_OT_BTN_9a2fd396ce(bpy.types.Operator):
 
             # Add new route for rotation
             bpy.ops.vpt.addprop()
+            bpy.context.scene.VPT_Items[1].id_type = 'objects'
             bpy.context.scene.VPT_Items[1].id.objects = bpy.data.objects["VP Orientation Correction"]
             bpy.context.scene.VPT_Items[1].data_path = "rotation_quaternion"
             bpy.context.scene.VPT_Items[1].engine = 'OSC'
@@ -496,7 +503,7 @@ class SNA_OT_BTN_9a2fd396ce(bpy.types.Operator):
                 for dr in drivers_data:
                     ob.driver_remove(dr.data_path, -1)
             except:
-                pass
+                print("Try Failed")
 
             ## Add Drivers (For Offset)
 
@@ -567,7 +574,7 @@ class SNA_OT_BTN_9a2fd396ce(bpy.types.Operator):
                 add_driver(camera, empty, 'rotation_quaternion', 'rotation_quaternion.y', 3)
                 add_driver(camera, empty, 'rotation_quaternion', 'rotation_quaternion.z', 0)
             except:
-                pass
+                print("Try Failed")
             # Offset
 
 
