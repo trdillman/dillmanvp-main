@@ -698,7 +698,7 @@ def set_variables():
 ## Streaming Server ##
 HTTPD = None
 #STREAM_MODE = 'webp'  ## note: there is a bug in firefox 'load' not getting called at right time
-STREAM_MODE = 'jpg'
+STREAM_MODE = 'JPG'
 CAP_RATE = 0.01
 JS_RATE  = 35
 if '10fps' in sys.argv:
